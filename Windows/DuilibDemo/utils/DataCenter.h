@@ -8,13 +8,18 @@
 
 class CConfigMgr;
 
-#define TRTCAudioQualityUnSelect 0
 enum LivePlayerSourceType
 {
     TRTC_RTC,
     TRTC_CDN
 };
 
+enum VodRenderMode
+{
+    VOD_RENDER_WND,
+    VOD_RENDER_CUSTOM,
+    VOD_RENDER_TRTC,
+};
 typedef struct RemoteUserInfo
 {
     std::string user_id = "";
@@ -136,11 +141,13 @@ public: //trtc
     bool m_bRemoteVideoMirror = false;     //暂不支持
     bool m_bShowAudioVolume =   true;      //开启音量提示
     bool m_bBlackFramePush = false;        //开启黑帧推流
+    bool m_bWateMark = false;
 
     bool m_bCustomAudioCapture = false;    //自定义采集音频
     bool m_bCustomVideoCapture = false;    //自定义采集视频
+    bool m_bCustomSubAudioCapture = false;    //自定义辅路采集音频
+    bool m_bCustomSubVideoCapture = false;    //自定义辅路采集视频
 
-    bool user_default_3a_config_ = true;  
     bool m_bEnableAec = true;
     bool m_bEnableAns = true;
     bool m_bEnableAgc = true;
@@ -176,12 +183,27 @@ public: //trtc
     bool m_bStartAudioRecording = false;
     std::wstring m_wstrAudioRecordFile;
 
+    bool m_bStartMixAppAudio = false;
+    std::wstring m_wstrMixAudioAppPath;
+
+    //本地录制参数
+    bool m_bStartLocalRecording = false;
+    std::wstring m_wstrLocalRecordFile;
+    TRTCLocalRecordType m_localRecordType = TRTCLocalRecordType_Both;
 
     bool m_bStartSystemVoice = false;
+    std::wstring third_app_path_;
 
-    int audio_quality_ = TRTCAudioQualityUnSelect;
+    int audio_quality_ = TRTCAudioQualitySpeech;
     LivePlayerSourceType m_emLivePlayerSourceType = TRTC_RTC;
-public: 
+
+    bool vod_push_video_ = true;
+    bool vod_push_audio_ = true;
+    VodRenderMode vod_render_mode_ = VOD_RENDER_WND;
+
+    bool need_minimize_windows_ = true;
+
+   public: 
     //远端用户信息
     RemoteUserInfoList m_remoteUser;
     void addRemoteUser(std::string userId, bool bClear = true);

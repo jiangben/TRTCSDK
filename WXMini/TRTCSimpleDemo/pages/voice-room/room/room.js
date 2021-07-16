@@ -1,336 +1,247 @@
-import { genTestUserSig } from '../../../debug/GenerateTestUserSig.js'
-const app = getApp()
-Page({
+import TRTC from '../../../static/trtc-wx'
+import { randomRoomID }  from '../../../utils/common'
 
-  /**
-   * 页面的初始数据
-   */
+Page({
   data: {
     roomID: 0, // 房间号
-    role: '',
-    userList: [], // 主播list
-    userID: '',
-    debugMode: false,
+    role: 'presenter',
     initialRole: '',
     showRolePanel: false,
-    presenterConfig: {
-      enableMic: true,
-      muteAllAudio: false,
-    },
-    headerHeight: app.globalData.headerHeight,
-    statusBarHeight: app.globalData.statusBarHeight,
-    rtcConfig: {
+    userID: '',
+    _rtcConfig: {
       sdkAppID: '', // 必要参数 开通实时音视频服务创建应用后分配的 sdkAppID
       userID: '', // 必要参数 用户 ID 可以由您的帐号系统指定
       userSig: '', // 必要参数 身份签名，相当于登录密码的作用
-      template: '', // 必要参数 组件模版，支持的值 1v1 grid custom ，注意：不支持动态修改, iOS 不支持 pusher 动态渲染
     },
+    pusher: null,
+    playerList: [],
+    muteAudio: false,
   },
-  enterRoom: function({ sdkAppID, userSig }) {
-    const template = 'custom'
-    const roomID = this.data.roomID
-    console.log('* room enterRoom', roomID, template)
-    this.data.rtcConfig = {
-      sdkAppID: sdkAppID, // 您的实时音视频服务创建应用后分配的 sdkAppID
-      userID: this.data.userID,
-      userSig: userSig,
-      template: template, // 1v1 grid custom
-      debugMode: this.data.debugMode, // 非必要参数，打开组件的调试模式，开发调试时建议设置为 true
-      audioVolumeType: this.data.audioVolumeType,
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+    console.log('room onload', options)
+    wx.setKeepScreenOn({
+      keepScreenOn: true,
+    })
+    this.TRTC = new TRTC(this)
+    this.init(options)
+    this.bindTRTCRoomEvent()
+    this.enterRoom({ roomID: options.roomID })
+  },
+
+  onReady() {
+    console.log('room ready')
+  },
+  onUnload() {
+    console.log('room unload')
+  },
+
+  init(options) {
+    // pusher 初始化参数
+    const pusherConfig = {
+      beautyLevel: 9,
+      audioVolumeType: 'media',
     }
+    const pusher = this.TRTC.createPusher(pusherConfig)
     this.setData({
-      rtcConfig: this.data.rtcConfig,
+      _rtcConfig: {
+        userID: options.userID,
+        sdkAppID: options.sdkAppID,
+        userSig: options.userSig,
+      },
+      role: options.role,
+      initialRole: options.role,
+      roomID: options.roomID,
+      pusher: pusher.pusherAttributes
+    })
+  },
+
+  enterRoom(options) {
+    const roomID = options.roomID || randomRoomID()
+    const config =  Object.assign(this.data._rtcConfig, { roomID })
+    this.setData({
+      pusher: this.TRTC.enterRoom(config),
     }, () => {
-      // 进房前决定是否推送视频或音频
-      if (this.data.role === 'presenter') {
-        this.trtcComponent.publishLocalAudio()
-      }
-      // roomID 取值范围 1 ~ 4294967295
-      this.trtcComponent.enterRoom({ roomID: roomID })
+      this.TRTC.getPusherInstance().start() // 开始推流（autoPush的模式下不需要）
     })
   },
-  getSignature: function(userID) {
-    console.log('* room getSignature', userID)
-    const Signature = genTestUserSig(userID)
-    this.enterRoom({
-      sdkAppID: Signature.sdkAppID,
-      userSig: Signature.userSig,
+
+  exitRoom() {
+    const result = this.TRTC.exitRoom()
+    this.setData({
+      pusher: result.pusher,
+      playerList: result.playerList,
     })
   },
-  bindTRTCRoomEvent: function() {
-    const TRTC_EVENT = this.trtcComponent.EVENT
+
+  // 设置 pusher 属性
+  setPusherAttributesHandler(options) {
+    this.setData({
+      pusher: this.TRTC.setPusherAttributes(options),
+    })
+  },
+
+  // 设置某个 player 属性
+  setPlayerAttributesHandler(player, options) {
+    this.setData({
+      playerList: this.TRTC.setPlayerAttributes(player.streamID, options),
+    })
+  },
+  // 事件监听
+  bindTRTCRoomEvent() {
+    const TRTC_EVENT = this.TRTC.EVENT
     // 初始化事件订阅
-    this.trtcComponent.on(TRTC_EVENT.LOCAL_JOIN, (event)=>{
+    this.TRTC.on(TRTC_EVENT.LOCAL_JOIN, (event) => {
       console.log('* room LOCAL_JOIN', event)
       // 进房成功，触发该事件后可以对本地视频和音频进行设置
-      // if (this.data.role === 'presenter') {
-      //   this.trtcComponent.publishLocalAudio()
-      // }
+      if (this.data.role === 'presenter') {
+        this.setPusherAttributesHandler({ enableMic: true })
+      }
     })
-    this.trtcComponent.on(TRTC_EVENT.LOCAL_LEAVE, (event)=>{
+    this.TRTC.on(TRTC_EVENT.LOCAL_LEAVE, (event) => {
       console.log('* room LOCAL_LEAVE', event)
     })
-    this.trtcComponent.on(TRTC_EVENT.ERROR, (event)=>{
+    this.TRTC.on(TRTC_EVENT.ERROR, (event) => {
       console.log('* room ERROR', event)
     })
-    // 远端用户进房
-    this.trtcComponent.on(TRTC_EVENT.REMOTE_USER_JOIN, (event)=>{
-      console.log('* room REMOTE_USER_JOIN', event, this.trtcComponent.getRemoteUserList())
-      const userList = this.trtcComponent.getRemoteUserList()
-      this.handleOnUserList(userList).then(() => {
-        console.log(this.data.userList)
-      })
-    })
     // 远端用户退出
-    this.trtcComponent.on(TRTC_EVENT.REMOTE_USER_LEAVE, (event)=>{
-      console.log('* room REMOTE_USER_LEAVE', event, this.trtcComponent.getRemoteUserList())
-      const userList = this.trtcComponent.getRemoteUserList()
-      this.handleOnUserList(userList).then(() => {
-        console.log(this.data.userList)
+    this.TRTC.on(TRTC_EVENT.REMOTE_USER_LEAVE, (event) => {
+      console.log('* room REMOTE_USER_LEAVE', event)
+      const { playerList } = event.data
+      this.setData({
+        playerList,
       })
     })
     // 远端用户推送音频
-    this.trtcComponent.on(TRTC_EVENT.REMOTE_AUDIO_ADD, (event)=>{
-      if (this.data.userList.length < 6) {
-        // 订阅音频
-        const data = event.data
-        // 如果不订阅就不会自动播放音频
-        const userList = this.trtcComponent.getRemoteUserList()
-        this.handleOnUserList(userList).then(() => {
-          console.log(this.data.userList)
-        })
-        console.log('* room REMOTE_AUDIO_ADD', event, this.trtcComponent.getRemoteUserList())
-        this.trtcComponent.subscribeRemoteAudio({ userID: data.userID })
-      }
+    this.TRTC.on(TRTC_EVENT.REMOTE_AUDIO_ADD, (event) => {
+      console.log('* room REMOTE_AUDIO_ADD', event)
+      const { player } = event.data
+      this.setPlayerAttributesHandler(player, { muteAudio: false })
     })
     // 远端用户取消推送音频
-    this.trtcComponent.on(TRTC_EVENT.REMOTE_AUDIO_REMOVE, (event)=>{
-      console.log('* room REMOTE_AUDIO_REMOVE', event, this.trtcComponent.getRemoteUserList())
-      const userList = this.trtcComponent.getRemoteUserList()
-      this.handleOnUserList(userList).then(() => {
-        console.log(this.data.userList)
-      })
-    })
-    this.trtcComponent.on(TRTC_EVENT.REMOTE_AUDIO_VOLUME_UPDATE, (event)=>{
-      const userID = event.data.target.dataset.userid
-      const volume = event.data.detail.volume
-      this.data.userList.forEach((item) =>{
-        if (item.userID === userID) {
-          item.volume = volume
-        }
-      })
-      this.setData({
-        userList: this.data.userList,
-      })
+    this.TRTC.on(TRTC_EVENT.REMOTE_AUDIO_REMOVE, (event) => {
+      console.log('* room REMOTE_AUDIO_REMOVE', event)
+      const { player } = event.data
+      this.setPlayerAttributesHandler(player, { muteAudio: true })
     })
   },
-  handleOnUserList: function(userList) {
-    return new Promise((resolve, reject) => {
-      const newUserList = []
-      let index = 0
-      const oldUserList = this.data.userList
-      userList.forEach((item) => {
-        if (item.hasMainAudio) {
-          const user = this.judgeWhetherExist({ userID: item.userID, streamType: 'main' }, oldUserList)
-          index += 1
-          if (user) {
-            // 已存在
-            newUserList.push(Object.assign(user, { index: index }))
-          } else {
-            newUserList.push({
-              userID: item.userID,
-              streamType: 'main',
-              index: index,
-              hasMainAudio: item.hasMainAudio,
-              volume: 0,
-            })
-          }
-        }
-      })
-      this.setData({
-        userList: newUserList,
-      }, () => {
-        console.log('handleOnUserList newUserList', newUserList)
-        resolve()
-      })
-    })
-  },
-  judgeWhetherExist: function(target, userList) {
-    userList.forEach( (item) => {
-      if (target.userID === item.userID && target.streamType === item.streamType) {
-        return item
-      }
-    })
-    return false
-  },
-  handlePublishAudio() {
-    if (this.data.presenterConfig.enableMic) {
-      this.trtcComponent.unpublishLocalAudio()
-      const config = this.data.presenterConfig
-      config.enableMic = false
-      this.setData({
-        presenterConfig: config,
-      }, () => {
-        wx.showToast({
-          title: '您已关闭麦克风',
-          icon: 'none',
-          duration: 500,
-        })
-      })
-    } else {
-      this.trtcComponent.publishLocalAudio()
-      const config = this.data.presenterConfig
-      config.enableMic = true
-      this.setData({
-        presenterConfig: config,
-      }, () => {
-        wx.showToast({
-          title: '您已开启麦克风',
-          icon: 'none',
-          duration: 500,
-        })
-      })
-    }
-  },
-  handleMuteAllAudio() {
-    if (this.data.presenterConfig.muteAllAudio) {
-      this.data.userList.forEach((item) => {
-        this.trtcComponent.subscribeRemoteAudio({ userID: item.userID })
-      })
-      const config = this.data.presenterConfig
-      config.muteAllAudio = false
-      this.setData({
-        presenterConfig: config,
-      }, () => {
-        wx.showToast({
-          title: '取消禁音成功',
-          icon: 'none',
-          duration: 500,
-        })
-      })
-    } else {
-      this.data.userList.forEach((item) => {
-        this.trtcComponent.unsubscribeRemoteAudio({ userID: item.userID })
-      })
-      const config = this.data.presenterConfig
-      config.muteAllAudio = true
-      this.setData({
-        presenterConfig: config,
-      }, () => {
-        wx.showToast({
-          title: '禁音成功',
-          icon: 'none',
-          duration: 500,
-        })
-      })
-    }
-  },
-  /**
-   * 返回上一页
-   */
-  onBack: function() {
-    wx.navigateBack({
-      delta: 1,
-    })
-  },
-  handleRoleChange() {
-    if (this.data.initialRole !== 'presenter' ) {
+
+  _handleRoleChange() {
+    if (this.data.initialRole !== 'presenter') {
       this.setData({
         showRolePanel: !this.data.showRolePanel,
       })
     }
   },
-  confirmRoleChange() {
-    if (this.data.role === 'audience') {
-      this.trtcComponent.publishLocalAudio().then(() => {
-        this.setData({
-          role: 'presenter',
-          showRolePanel: false,
-        })
-      }).catch(() => {
-        wx.showToast({
-          icon: 'none',
-          title: '上麦失败',
-        })
+
+  // 是否订阅某一个player Audio
+  _mutePlayerAudio(event) {
+    const player = event.currentTarget.dataset.value
+    if (player.hasAudio && player.muteAudio) {
+      this.setPlayerAttributesHandler(player, { muteAudio: false })
+      return
+    }
+    if (player.hasAudio && !player.muteAudio) {
+      this.setPlayerAttributesHandler(player, { muteAudio: true })
+      return
+    }
+  },
+
+
+  // 挂断退出房间
+  _hangUp() {
+    this.exitRoom()
+    wx.navigateBack({
+      delta: 1,
+    })
+  },
+  // 关闭
+  _allPlayerMuteAudio() {
+    if (this.data.playerList.length === 0) {
+      return
+    }
+    const players = this.TRTC.getPlayerList()
+    const muteAudio = !this.data.muteAudio
+    if (muteAudio) {
+      wx.showToast({
+        title: '开启禁言',
+        icon: 'none',
+        duration: 2000,
       })
     } else {
-      this.trtcComponent.unpublishLocalAudio().then(() => {
-        this.setData({
-          role: 'audience',
-          showRolePanel: false,
-        })
-      }).catch(() => {
-        wx.showToast({
-          icon: 'none',
-          title: '下麦失败',
-        })
+      wx.showToast({
+        title: '取消禁言',
+        icon: 'none',
+        duration: 2000,
+      })
+    }
+    this.setData({
+      muteAudio: muteAudio
+    })
+    players.forEach((player) => {
+      this.setPlayerAttributesHandler(player, { muteAudio: muteAudio })
+    })
+  },
+  _confirmRoleChange() {
+    if (this.data.role === 'audience') {
+      this.setPusherAttributesHandler({ enableMic: true })
+      this.setData({
+        role: 'presenter',
+        showRolePanel: false,
+      })
+    } else {
+      this.setPusherAttributesHandler({ enableMic: false })
+      this.setData({
+        role: 'audience',
+        showRolePanel: false,
       })
     }
   },
-  /**
-   * 生命周期函数--监听页面加载
-   * @param {*} options 配置项
-   */
-  onLoad: function(options) {
-    console.log('room onload', options)
-    wx.setKeepScreenOn({
-      keepScreenOn: true,
-    })
-    // 获取 rtcroom 实例
-    this.trtcComponent = this.selectComponent('#trtc-component')
-    Object.getOwnPropertyNames(options).forEach((key) => {
-      if (options[key] === 'true') {
-        options[key] = true
-      }
-      if (options[key] === 'false') {
-        options[key] = false
-      }
-    })
-    // 监听TRTC Room 关键事件
-    this.bindTRTCRoomEvent()
-    this.setData({
-      roomID: parseInt(options.roomID),
-      role: options.role,
-      initialRole: options.role,
-      userID: options.userID,
-      debugMode: options.debugMode,
-      audioVolumeType: options.audioVolumeType,
-    }, () => {
-      this.getSignature(options.userID)
-    })
+  // 订阅 / 取消订阅 Audio
+  _pusherAudioHandler() {
+    if (this.data.pusher.enableMic) {
+      this.setPusherAttributesHandler({ enableMic: false })
+    } else {
+      this.setPusherAttributesHandler({ enableMic: true })
+    }
   },
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function() {
-    console.log('room ready')
-    wx.setKeepScreenOn({
-      keepScreenOn: true,
-    })
+
+  // 请保持跟 wxml 中绑定的事件名称一致
+  _pusherStateChangeHandler(event) {
+    this.TRTC.pusherEventHandler(event)
   },
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function() {
-    console.log('room show')
-    wx.setKeepScreenOn({
-      keepScreenOn: true,
-    })
+  _pusherNetStatusHandler(event) {
+    this.TRTC.pusherNetStatusHandler(event)
   },
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function() {
-    console.log('room hide')
+  _pusherErrorHandler(event) {
+    this.TRTC.pusherErrorHandler(event)
   },
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function() {
-    console.log('room unload')
-    wx.setKeepScreenOn({
-      keepScreenOn: false,
-    })
+  _pusherBGMStartHandler(event) {
+    this.TRTC.pusherBGMStartHandler(event)
+  },
+  _pusherBGMProgressHandler(event) {
+    this.TRTC.pusherBGMProgressHandler(event)
+  },
+  _pusherBGMCompleteHandler(event) {
+    this.TRTC.pusherBGMCompleteHandler(event)
+  },
+  _pusherAudioVolumeNotify(event) {
+    this.TRTC.pusherAudioVolumeNotify(event)
+  },
+  _playerStateChange(event) {
+    this.TRTC.playerEventHandler(event)
+  },
+  _playerFullscreenChange(event) {
+    this.TRTC.playerFullscreenChange(event)
+  },
+  _playerNetStatus(event) {
+    this.TRTC.playerNetStatus(event)
+  },
+  _playerAudioVolumeNotify(event) {
+    this.TRTC.playerAudioVolumeNotify(event)
   },
 })
 

@@ -1,7 +1,5 @@
 import { genTestUserSig } from '../../debug/GenerateTestUserSig'
 
-const app = getApp()
-
 Page({
   data: {
     userIDToSearch: '',
@@ -14,9 +12,9 @@ Page({
     inviteCallFlag: false,
     pusherAvatar: '',
     config: {
-      sdkAppID: app.globalData.sdkAppID,
-      userID: app.globalData.userID,
-      userSig: app.globalData.userSig,
+      sdkAppID: wx.$globalData.sdkAppID,
+      userID: wx.$globalData.userID,
+      userSig: wx.$globalData.userSig,
       type: 2,
     },
   },
@@ -80,10 +78,10 @@ Page({
       this.TRTCCalling.hangup()
     })
     this.TRTCCalling.on(TRTCCallingEvent.USER_LEAVE, () => {
-      this.TRTCCalling.hangup()
-      wx.showToast({
-        title: '对方已挂断',
-      })
+      // this.TRTCCalling.hangup()
+      // wx.showToast({
+      //   title: '对方已挂断',
+      // })
     })
     this.TRTCCalling.on(TRTCCallingEvent.NO_RESP, () => {
       this.setData({
@@ -91,9 +89,20 @@ Page({
         inviteCallFlag: false,
       })
       wx.showToast({
-        title: '无应答超时',
+        title: '对方不在线',
       })
       this.TRTCCalling.hangup()
+    })
+    this.TRTCCalling.on(TRTCCallingEvent.CALLING_TIMEOUT, () => {
+      console.log('CALLING_TIMEOUT')
+      this.setData({
+        incomingCallFlag: false,
+        inviteCallFlag: false,
+      })
+      wx.showToast({
+        title: '无应答超时',
+      })
+      // this.TRTCCalling.hangup()
     })
     this.TRTCCalling.on(TRTCCallingEvent.LINE_BUSY, () => {
       this.setData({
@@ -118,10 +127,16 @@ Page({
         inviteCallFlag: false,
       })
     })
+    this.TRTCCalling.on(TRTCCallingEvent.CALL_END, () => {
+      wx.showToast({
+        title: '通话结束',
+      })
+      this.TRTCCalling.hangup()
+    })
   },
 
   handleOnAccept: function() {
-    this.data.config.type = this.data.invitation.type
+    this.data.config.type = this.data.invitation.inviteData.callType
     this.setData({
       callingFlag: true,
       incomingCallFlag: false,
@@ -154,12 +169,12 @@ Page({
   },
 
   onLoad: function() {
-    const Signature = genTestUserSig(app.globalData.userID)
-    this.data.config.userID = app.globalData.userID
+    const Signature = genTestUserSig(wx.$globalData.userID)
+    this.data.config.userID = wx.$globalData.userID
     this.data.config.userSig = Signature.userSig
     this.setData({
       config: this.data.config,
-      loaclPhoneNumber: app.globalData.userID,
+      loaclPhoneNumber: wx.$globalData.userID,
       pusherAvatar: this.data.pusherAvatar,
     }, () => {
       this.TRTCCalling = this.selectComponent('#TRTCCalling-component')

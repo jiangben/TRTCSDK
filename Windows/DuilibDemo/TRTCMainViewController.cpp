@@ -114,7 +114,9 @@ TRTCMainViewController::~TRTCMainViewController()
     TRTCCloudCore::GetInstance()->removeSDKMsgObserverByHwnd(GetHWND());
     m_pmUI.RemoveNotifier(this);
     m_pmUI.RemoveNotifier(m_pMainViewBottomBar);
-    TRTCCloudCore::Destory();
+    if (CDataCenter::GetInstance()->m_bOpenDemoTestConfig) {
+        TRTCCloudCore::Destory();
+    }
 }
 
 void TRTCMainViewController::Notify(TNotifyUI & msg)
@@ -183,8 +185,6 @@ void TRTCMainViewController::enterRoom()
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_VideoAvailable, GetHWND());
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_ScreenStart, GetHWND());
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_ScreenEnd, GetHWND());
-    TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_VodStart, GetHWND());
-    TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_VodEnd, GetHWND());
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_UserVoiceVolume, GetHWND());
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_PKConnectStatus, GetHWND());
     TRTCCloudCore::GetInstance()->regSDKMsgObserver(WM_USER_CMD_PKDisConnectStatus, GetHWND());
@@ -199,23 +199,12 @@ void TRTCMainViewController::enterRoom()
 
     TRTCCloudCore::GetInstance()->getTRTCCloud()->setLocalVideoRenderCallback(TRTCVideoPixelFormat_BGRA32, TRTCVideoBufferType_Buffer, (ITRTCVideoRenderCallback*)getShareViewMgrInstance());
 
-    //设置代理环境
-    //TRTCCloudCore::GetInstance()->getTRTCCloud()->callExperimentalAPI("{\"api\": \"setProxy\",\"params\" :{\"socks5_host\" : \"120.27.153.72\",\"socks5_port\" : 35726,\"socks5_auth\" : \"\", \"http_host\": \"45.125.32.182\",\"http_port\" : 3128,\"http_auth\" : \"\"}}");
-
-    //设置连接环境
-    std::string cmd = format("{\"api\": \"setNetEnv\",\"params\" :{\"env\" : %d}}", CDataCenter::GetInstance()->m_nLinkTestServer);
-    TRTCCloudCore::GetInstance()->getTRTCCloud()->callExperimentalAPI(cmd.c_str());
-
     TRTCCloudCore::GetInstance()->getTRTCCloud()->setDefaultStreamRecvMode(\
         CDataCenter::GetInstance()->m_bAutoRecvAudio, CDataCenter::GetInstance()->m_bAutoRecvVideo);
 
-    if (CDataCenter::GetInstance()->audio_quality_ != TRTCAudioQualityUnSelect ) {
-        TRTCCloudCore::GetInstance()->getTRTCCloud()->setAudioQuality((TRTCAudioQuality)CDataCenter::GetInstance()->audio_quality_);
-    }
-	InternalEnterRoom();
+    TRTCCloudCore::GetInstance()->getTRTCCloud()->setAudioQuality((TRTCAudioQuality)CDataCenter::GetInstance()->audio_quality_);
 
-    // 关闭 SDK 内部无权限提示弹窗，无权限警告码会通过 onWarning 抛出
-    //TRTCCloudCore::GetInstance()->getTRTCCloud()->callExperimentalAPI("{\"api\":\"enablePopupTips\",\"params\" :{\"enable\":false}}");
+	InternalEnterRoom();
 
     //进入房间
     LocalUserInfo& info = CDataCenter::GetInstance()->getLocalUserInfo();
@@ -234,12 +223,11 @@ void TRTCMainViewController::enterRoom()
         TRTCCloudCore::GetInstance()->getTRTCCloud()->setVideoEncoderParam(CDataCenter::GetInstance()->m_videoEncParams);
         TRTCCloudCore::GetInstance()->getTRTCCloud()->setLocalRenderParams(CDataCenter::GetInstance()->getLocalRenderParams());
         TRTCCloudCore::GetInstance()->getTRTCCloud()->setVideoEncoderMirror(CDataCenter::GetInstance()->m_bLocalVideoMirror);
+        
     }
 
     TRTCCloudCore::GetInstance()->getTRTCCloud()->setNetworkQosParam(CDataCenter::GetInstance()->m_qosParams);
 
-    TRTCCloudCore::GetInstance()->getDeviceManager()->setCurrentDeviceVolume(TRTCDeviceTypeMic, CDataCenter::GetInstance()->m_micVolume);
-    //TRTCCloudCore::GetInstance()->getDeviceManager()->setCurrentDeviceVolume(TRTCDeviceTypeSpeaker, CDataCenter::GetInstance()->m_speakerVolume);
     if (CDataCenter::GetInstance()->m_bShowAudioVolume)
         TRTCCloudCore::GetInstance()->getTRTCCloud()->enableAudioVolumeEvaluation(200);
 
@@ -865,7 +853,10 @@ void TRTCMainViewController::onSubVideoAvailable(std::string userId, bool availa
             if (bRet == 0) {
                 TRTCCloudCore::GetInstance()->getTRTCCloud()->startRemoteView(userId.c_str(), TRTCVideoStreamTypeSub, NULL);
             }
-            remoteInfo->subscribe_sub_video = true;
+           
+            if (m_pUserListController->VideoAllMuted() != true) {
+                remoteInfo->subscribe_sub_video = true;
+            }
 
             TRTCCloudCore::GetInstance()->getTRTCCloud()->setRemoteVideoRenderCallback(userId.c_str(), TRTCVideoPixelFormat_BGRA32, \
                 TRTCVideoBufferType_Buffer, (ITRTCVideoRenderCallback*)getShareViewMgrInstance());
@@ -879,12 +870,16 @@ void TRTCMainViewController::onSubVideoAvailable(std::string userId, bool availa
         if(remoteInfo != nullptr && remoteInfo->user_id != "")
         {
             remoteInfo->available_sub_video = false;
-            remoteInfo->subscribe_sub_video = false;
+            if (m_pUserListController->VideoAllMuted() != false) {
+                remoteInfo->subscribe_sub_video = false;
+            }
         }
     }
     if (CDataCenter::GetInstance()->m_mixTemplateID <= TRTCTranscodingConfigMode_Manual) TRTCCloudCore::GetInstance()->updateMixTranCodeInfo();
-    m_pVideoViewLayout->muteVideo(UTF82Wide(userId), TRTCVideoStreamTypeSub, !available);
-
+    if (m_pUserListController->VideoAllMuted() != available) {
+        m_pVideoViewLayout->muteVideo(UTF82Wide(userId), TRTCVideoStreamTypeSub, !available);
+    }
+    
     LocalUserInfo info = CDataCenter::GetInstance()->getLocalUserInfo();
     CDuiString strFormat;
     strFormat.Format(L"%s[%s]onSubVideoAvailable : %d", Log::_GetDateTimeString().c_str(), UTF82Wide(userId).c_str(), available);
@@ -899,7 +894,9 @@ void TRTCMainViewController::onVideoAvailable(std::string userId, bool available
         if(remoteInfo != nullptr && remoteInfo->user_id != "")
         {
             remoteInfo->available_main_video = true;
-            remoteInfo->subscribe_main_video = true;
+            if (m_pUserListController->VideoAllMuted() != true) {
+                remoteInfo->subscribe_main_video = true;
+            }
             if (m_pVideoViewLayout->IsRemoteViewShow(UTF82Wide(userId), TRTCVideoStreamTypeBig));
             {
                 TRTCCloudCore::GetInstance()->getTRTCCloud()->startRemoteView(
@@ -916,14 +913,20 @@ void TRTCMainViewController::onVideoAvailable(std::string userId, bool available
         if(remoteInfo != nullptr && remoteInfo->user_id != "")
         {
             remoteInfo->available_main_video = false;
-            remoteInfo->subscribe_main_video = false;
+            if (m_pUserListController->VideoAllMuted() != false) {
+                remoteInfo->subscribe_main_video = false;
+            }
+            
         }
     }
 
     m_pUserListController->UpdateUserInfo(*remoteInfo);
 
     if (CDataCenter::GetInstance()->m_mixTemplateID <= TRTCTranscodingConfigMode_Manual) TRTCCloudCore::GetInstance()->updateMixTranCodeInfo();
-    m_pVideoViewLayout->muteVideo(UTF82Wide(userId), TRTCVideoStreamTypeBig, !available);
+    if (m_pUserListController->VideoAllMuted() != available) {
+        m_pVideoViewLayout->muteVideo(UTF82Wide(userId), TRTCVideoStreamTypeBig, !available);
+    }
+   
     LocalUserInfo info = CDataCenter::GetInstance()->getLocalUserInfo();
     CDuiString strFormat;
     strFormat.Format(L"%s[%s]onVideoAvailable : %d", Log::_GetDateTimeString().c_str(), UTF82Wide(userId).c_str(), available);
@@ -941,8 +944,11 @@ void TRTCMainViewController::onAudioAvailable(std::string userId, bool available
     if(remoteInfo != nullptr && remoteInfo->user_id != "")
     {
         remoteInfo->available_audio = available;
-        remoteInfo->subscribe_audio = available;
-        m_pVideoViewLayout->muteAudio(UTF82Wide(userId),TRTCVideoStreamTypeBig, !available);
+        if (m_pUserListController->AudioAllMuted() != available)
+        {
+            remoteInfo->subscribe_audio = available;
+            m_pVideoViewLayout->muteAudio(UTF82Wide(userId), TRTCVideoStreamTypeBig, !available);
+        }
     }
 
     m_pUserListController->UpdateUserInfo(*remoteInfo);
@@ -1000,7 +1006,7 @@ void TRTCMainViewController::onError(int errCode, std::string errMsg)
     LocalUserInfo info = CDataCenter::GetInstance()->getLocalUserInfo();
     if (errCode == ERR_SERVER_CENTER_ANOTHER_USER_PUSH_SUB_VIDEO || errCode == ERR_SERVER_CENTER_NO_PRIVILEDGE_PUSH_SUB_VIDEO || errCode == ERR_SERVER_CENTER_INVALID_PARAMETER_SUB_VIDEO)
     {
-        CMsgWnd::ShowMessageBox(GetHWND(), _T("TRTCDuilibDemo"), _T("Error: 屏幕分享发起失败，是否当前已经有人发起了共享！"), 0xFFF08080);
+        CMsgWnd::ShowMessageBox(GetHWND(), _T("TRTCDuilibDemo"), _T("Error: 辅路发起失败，是否当前已经有人发起了辅路！"), 0xFFF08080);
     }
     else if (errCode == ERR_CAMERA_START_FAIL || errCode == ERR_CAMERA_OCCUPY ||
         errCode == ERR_MIC_START_FAIL || errCode == ERR_MIC_OCCUPY || errCode == ERR_SPEAKER_START_FAIL)
@@ -1264,15 +1270,7 @@ void TRTCMainViewController::InternalEnterRoom()
         CDataCenter::GetInstance()->m_strCustomStreamId = format("%d_%d_%s_main", GenerateTestUserSig::SDKAPPID, info._roomId, info._userId.c_str());
     params.streamId = CDataCenter::GetInstance()->m_strCustomStreamId.c_str();
 
-    // TRTCCloudCore::GetInstance()->getTRTCCloud()->setEncodedDataProcessingListener();
-    char api_str[128] = {0};
-    sprintf_s(api_str, 128,
-              "{\"api\":\"setEncodedDataProcessingListener\", \"params\": {\"listener\":%llu}}",
-              (uint64_t)TRTCCustomerCrypt::getEncodedDataProcessingListener());
-    TRTCCloudCore::GetInstance()->getTRTCCloud()->callExperimentalAPI(api_str);
     TRTCCloudCore::GetInstance()->getTRTCCloud()->enterRoom(params, CDataCenter::GetInstance()->m_sceneParams);
-
-    
 }
 
 
@@ -1288,6 +1286,7 @@ void TRTCMainViewController::exitRoom()
     m_pUserListController->UnInitUserListUI();
     TXLiveAvVideoView::clearAllLogText();
     ShowWindow(false);
+    TRTCCloudCore::GetInstance()->getTRTCCloud()->muteAllRemoteAudio(true);
     TRTCCloudCore::GetInstance()->getTRTCCloud()->exitRoom();
 
     if (info._bEnterRoom == false || CDataCenter::GetInstance()->m_emLivePlayerSourceType == TRTC_CDN)

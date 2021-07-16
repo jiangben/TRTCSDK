@@ -76,26 +76,31 @@ void UiShareSelect::InitWindow()
     COptionUI* check_cap_mouse = static_cast<COptionUI*>(m_pm.FindControl(_T("check_cap_mouse")));
     COptionUI* check_cap_highlight = static_cast<COptionUI*>(m_pm.FindControl(_T("check_cap_highlight")));
     COptionUI* check_high_performance = static_cast<COptionUI*>(m_pm.FindControl(_T("check_high_performance")));
+    COptionUI* check_cap_child_wnd = static_cast<COptionUI*>(m_pm.FindControl(_T("check_cap_child_wnd")));
     if (check_cap_mouse && check_cap_highlight && check_high_performance) {
         check_cap_mouse->Selected(true);
         check_cap_highlight->Selected(true);
         check_high_performance->Selected(true);
+        check_cap_child_wnd->Selected(false);
     }
 
     ITRTCScreenCaptureSourceList* wndInfoList = TRTCCloudCore::GetInstance()->GetWndList();
-
+ 
     ms_nLastSelectedIndex = 0;
     if (ms_nLastSelectedIndex >= wndInfoList->getCount()) ms_nLastSelectedIndex = wndInfoList->getCount() - 1;
 
     for (size_t i = 0; i < wndInfoList->getCount(); ++i)
     {
+        if (!CDataCenter::GetInstance()->need_minimize_windows_ && wndInfoList->getSourceInfo(i).isMinimizeWindow) {
+            continue;
+        }
         ShareSelectItem* pItem = new ShareSelectItem();
         CVerticalLayoutUI* pUI = pItem->CreateControl(&m_pm);
         pUI->SetFixedWidth(150);
         pUI->SetFixedHeight(100);
         pItem->setWndInfo(wndInfoList->getSourceInfo(i));
-        pLayout->Add(pUI);
         if (i == ms_nLastSelectedIndex) pItem->select(true);
+        pLayout->Add(pUI);
         m_vecShareSelectItem.push_back(pItem);
     }
     wndInfoList->release();
@@ -123,6 +128,9 @@ void UiShareSelect::_onSelChanged(TNotifyUI& msg)
     }
     else if (msg.pSender->GetName() == _T("check_high_performance")) {
         m_screen_property.enableHighPerformance = pOpenSender->IsSelected();
+    }
+    else if (msg.pSender->GetName() == _T("check_cap_child_wnd")) {
+        m_screen_property.enableCaptureChildWindow = pOpenSender->IsSelected();
     }
     for (size_t i = 0; i < m_vecShareSelectItem.size(); ++i)
     {

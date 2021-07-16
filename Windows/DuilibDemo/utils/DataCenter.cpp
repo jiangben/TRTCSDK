@@ -136,13 +136,7 @@ void CDataCenter::Init()
     //音视频参数配置
     std::wstring strParam;
     bool bRet = false;
-
-
-    bRet = m_pConfigMgr->GetValue(INI_ROOT_KEY, INI_KEY_AUDIO_QUALITY, strParam);
-    if (bRet) {
-        audio_quality_ = (TRTCAudioQuality)_wtoi(strParam.c_str());
-    }
-        
+  
     bRet = m_pConfigMgr->GetValue(INI_ROOT_KEY, INI_KEY_VIDEO_RESOLUTION, strParam);
     if (bRet)
         m_videoEncParams.videoResolution = (TRTCVideoResolution)_wtoi(strParam.c_str());
@@ -306,6 +300,12 @@ void CDataCenter::Init()
     else
         m_strSocks5ProxyPort = 0;
 
+
+    bRet = m_pConfigMgr->GetValue(INI_ROOT_KEY, INI_KEY_LOCAL_VIDEO_MIRROR, strParam);
+    if (bRet)
+        m_bLocalVideoMirror = _wtoi(strParam.c_str());
+    else
+        m_bLocalVideoMirror = false;
 }
 
 void CDataCenter::WriteEngineConfig()
@@ -317,8 +317,6 @@ void CDataCenter::WriteEngineConfig()
 
     //音视频参数配置
     DuiLib::CDuiString strFormat;
-    strFormat.Format(L"%d", audio_quality_);
-    m_pConfigMgr->SetValue(INI_ROOT_KEY, INI_KEY_AUDIO_QUALITY, strFormat.GetData());
     strFormat.Format(L"%d", m_videoEncParams.videoBitrate);
     m_pConfigMgr->SetValue(INI_ROOT_KEY, INI_KEY_VIDEO_BITRATE, strFormat.GetData());
     strFormat.Format(L"%d", m_videoEncParams.videoResolution);

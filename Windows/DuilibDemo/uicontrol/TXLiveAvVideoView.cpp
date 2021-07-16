@@ -143,7 +143,7 @@ class CDNLivePlayerViewMgr :public ITXLivePlayerCallback
 {
     virtual void onEventCallback(int eventId, const int paramCount, const char **paramKeys, const char **paramValues, void *pUserData)
     {
-        
+        int n = eventId;
     }
     virtual void onVideoDecodeCallback(char* data, unsigned int length, int width, int height, TXEOutputVideoFormat format, void *pUserData)
     {
@@ -155,7 +155,7 @@ class CDNLivePlayerViewMgr :public ITXLivePlayerCallback
     }
     virtual void onAudioDecodeCallback(unsigned char * pcm, unsigned int length, unsigned int sampleRate, unsigned int channel, unsigned long long timestamp, void *pUserData)
     {
-        LINFO(L"onEventCallback");
+
     }
 };
 

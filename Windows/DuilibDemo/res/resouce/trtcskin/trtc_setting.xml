@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="660,600" sizebox="0,0,0,0">
+<Window size="660,650" sizebox="0,0,0,0">
 	<Font name="微软雅黑" size="12" default="true" />
 	<Font id="0" name="微软雅黑" size="14" bold="true"/>
 	<Font id="1" name="微软雅黑" size="14" bold="false"/>
@@ -19,9 +19,10 @@
 			<Option height="30" text="常规设置" name="normal_tab" font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/normal_normal.png'"/>
 			<Option height="30" text="视频设置" name="video_tab" font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/video_normal.png'"/>
 			<Option height="30" text="声音设置" name="audio_tab" font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/audio_normal.png'"/>
-			<Option height="30" text="混流设置" name="mix_tab"  font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/other_set.png'"/>
-			<Option height="30" text="本地录制" name="record_tab"  font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/other_set.png'"/>
+			<Option height="30" text="混流设置" name="mix_tab"  font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/mixstream_normal.png'"/>
+			<Option height="30" text="本地录制" name="record_tab"  font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/record_normal.png'"/>
 			<Option height="30" text="其他设置" name="other_tab" font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/other_set.png'"/>
+			<Option height="30" text="点播设置" name="vod_tab" font="1" hotbkcolor="#FFEEEEEE" selectedbkcolor="#FFD8D8D8" group="tab_setting" foreimage="dest='20,7,36,23' res='setting/vod_palyer.png'"/>
 		</VerticalLayout>
 		<VerticalLayout width="2" bkcolor="#FF808080"/>
 		<VerticalLayout>
@@ -187,12 +188,7 @@
 			<!--Audio setting page-->
 			<VerticalLayout name="Audio_tab_layout" childpadding="10" vscrollbar="true">
 				<HorizontalLayout height="10"/>
-				<GroupBox name="audio_groupbox" text="" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="160">
-					<HorizontalLayout inset="0,6,0,0" childvalign="left" height="24" name="layout_system_audio_mix">
-						<Label text="禁止Demo设置3A" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
-						<VerticalLayout width="20"/>
-						<Option name="check_btn_3a_config" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
-					</HorizontalLayout>
+				<GroupBox name="audio_groupbox" text="" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="140">
 					<HorizontalLayout inset="0,6,0,0" childvalign="left" height="24" name="layout_system_audio_mix">
 						<Label text="启动回声消除" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
 						<VerticalLayout width="20"/>
@@ -268,7 +264,7 @@
 						<Combo name="combo_speaker_device" width="250" height="36" style="devicecombo" dropbox="bordercolor=&quot;#FF1E90FF&quot; bordersize=&quot;1&quot; bkcolor=&quot;#FFFFFFFF&quot;">
 						</Combo>  
 					</HorizontalLayout>
-					<HorizontalLayout inset="20,0,0,0" height="20">
+					<HorizontalLayout inset="20,0,0,0" childvalign="center" height="20">
 						<Label text="音量: " font="2" width="100" align="right" valign="center" textcolor="#FF000000" height="20"/>
 						<Slider name="slider_speaker_volume" enabled="true" width="200" height="19" value="45" min="0" max="100" style="slider_style"/>
 						<Label name="lable_speaker_volume" text="19%" font="2" width="60" height="16" align="left" valign="bottom" padding="10,3,0,0" textcolor="#FF000000"/>
@@ -327,9 +323,9 @@
 			</VerticalLayout>
 			
 			<!--record setting page-->
-			<VerticalLayout name="record_tab_layout" childpadding="10">
-			<VerticalLayout height="20"/>
-			<GroupBox text="本地AV录制" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="300">
+			<VerticalLayout name="record_tab_layout" childpadding="10" vscrollbar="true">
+			<VerticalLayout height="5"/>
+			<GroupBox text="本地AV录制" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="210">
 				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="30">
 					<Label text="启动录制" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,6,0,1"/>
 					<VerticalLayout width="20"/>
@@ -363,7 +359,7 @@
 					<VerticalLayout width="5"/>
 				</HorizontalLayout>
 				</GroupBox>
-			<GroupBox text="录音" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="200">
+			<GroupBox text="录音" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="180">
 				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="30">
 					<Label text="启动录音" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,6,0,1"/>
 					<VerticalLayout width="20"/>
@@ -384,11 +380,68 @@
 					<VerticalLayout width="5"/>
 				</HorizontalLayout>
 			</GroupBox>
+			<GroupBox text="进程混音" padding="20,0,20,0" childpadding="20" bordercolor="#FF808080" bkcolor="#FFF0F0F0" bordersize="1" height="180">
+				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="30">
+					<Label text="启动混音" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,6,0,1"/>
+					<VerticalLayout width="20"/>
+					<Option name="check_start_mix_app_audio" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true" padding="0,6,0,0"/>
+				</HorizontalLayout>
+				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+					<Label text="应用路径" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+					<VerticalLayout width="20"/>
+					<Edit name="edit_mix_app_audio_filepath" text="D:\\test\\QQmusic.exe" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="D:\\test\\QQmusic.exe" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+					<VerticalLayout width="20"/>
+					<Button name="btn_update_mix_app_audio_filepath" text="更新" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+					<VerticalLayout width="20"/>
+				</HorizontalLayout>
+				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="30">
+					<Label text="状态提示:" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,6,0,1"/>
+					<VerticalLayout width="20"/>
+					<Label name="label_mix_app_audio_opt_status" text="" width="400" font="1" align="left" valign="left" textcolor="#FFEE7942" showhtml="true" padding="0,3,0,1"/>
+					<VerticalLayout width="5"/>
+				</HorizontalLayout>
+			</GroupBox>
+			<GroupBox bkcolor="#FFF0F0F0" bordercolor="#FF808080" bordersize="1" childpadding="20" height="300" padding="20,0,20,0" text="本地录制">
+				<HorizontalLayout childvalign="left" height="30" inset="0,0,0,0">
+					<Label text="启动录制" font="2" width="70" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,6,0,1"/>
+					<VerticalLayout width="20"/>
+					<Option name="check_start_local_record" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true" padding="0,6,0,0"/>
+				</HorizontalLayout>
+				<HorizontalLayout childvalign="left" height="24" inset="0,0,0,0">
+					<Label align="right" font="2" padding="0,3,0,1" showhtml="true" text="录制文件" textcolor="#FF000000" valign="center"
+						width="70" />
+					<VerticalLayout width="20" />
+					<Edit name="edit_local_record_filepath" align="center" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'" font="2" height="24" normalimage="res='login/edit_normal.png' corner='6,6,6,6'"
+						text="D:\\test\\1.mp4" textpadding="20,0,20,0" tipvalue="D:\\test\\1.mp4"
+						tipvaluealign="center" tipvaluecolor="#FF808080" />
+				</HorizontalLayout>
+				<HorizontalLayout inset="28,0,0,0" name="choose_local_record_type" childvalign="left" height="24">
+					<Label text="录制类型: " font="2" width="80" align="left" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,0"/>
+					<Option name="local_record_audio" group="mixtemptyle" text="仅音频" style="radio_style" width="0" autocalcwidth="true"/>
+					<Option name="local_record_video" group="mixtemptyle" text="仅视频" style="radio_style" width="0" autocalcwidth="true"/>
+					<Option name="local_record_both" group="mixtemptyle" text="音视频" style="radio_style" width="0" autocalcwidth="true"/>
+				</HorizontalLayout>
+				<HorizontalLayout childvalign="left" height="24" inset="0,0,0,0">
+					<VerticalLayout width="20" />
+					<Button name="btn_update_local_record_filepath" style="btn_style" height="30" text="更新" textcolor="#FF000000"
+						textpadding="6,0,6,0" width="60" />
+					<VerticalLayout width="20" />
+				</HorizontalLayout>
+				<HorizontalLayout childvalign="left" height="30" inset="0,0,0,0">
+					<Label align="right" font="2" padding="0,6,0,1" showhtml="true" text="状态提示:" textcolor="#FF000000" valign="center"
+						width="70" />
+					<VerticalLayout width="20" />
+					<Label name="label_local_record_opt_status" align="left" font="1" padding="0,3,0,1" showhtml="true" text="" textcolor="#FFEE7942"
+						valign="left" width="400" />
+					<VerticalLayout width="5" />
+				</HorizontalLayout>
+			</GroupBox>
 			</VerticalLayout>
 			
 			<!--other setting page-->
-			<VerticalLayout name="other_tab_layout" childpadding="10">
-				<VerticalLayout height="20"/>
+			<VerticalLayout name="other_tab_layout" childpadding="10" vscrollbar="true">
+
+				<VerticalLayout height="10"/>
 				
 				<HorizontalLayout inset="28,6,0,0" childvalign="left" height="24">
 					<Label text="本地画面镜像" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
@@ -401,9 +454,9 @@
 					<Option name="check_voice_volume" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
 				</HorizontalLayout>
 				<HorizontalLayout inset="28,6,0,0" childvalign="left" height="24">
-					<Label text="开启黑帧推流" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
+					<Label text="开启水印" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
 					<VerticalLayout width="80"/>
-					<Option name="check_black_push" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
+					<Option name="check_water_mark" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
 				</HorizontalLayout>
 				<HorizontalLayout inset="28,0,0,0" childvalign="left" height="24">
 					<Label text="开启自定义采集音频" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
@@ -425,6 +478,25 @@
 					</Combo>  
 				</HorizontalLayout>
 				<HorizontalLayout inset="28,0,0,0" childvalign="left" height="24">
+					<Label text="开启自定义辅路采集音频" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+					<VerticalLayout width="80"/>
+					<Option name="check_custom_sub_audio" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true" padding="0,3,0,0"/>
+					<VerticalLayout width="20"/>
+					<Combo name="combo_audio_sub_pcmfile" width="130" height="24" style="devicecombo" dropbox="bordercolor=&quot;#FF1E90FF&quot; bordersize=&quot;1&quot; bkcolor=&quot;#FFFFFFFF&quot;">
+						<ListLabelElement text="48_1_audio.pcm"/>
+						<ListLabelElement text="16_1_audio.pcm"/>
+					</Combo>
+				</HorizontalLayout>
+				<HorizontalLayout inset="28,0,0,0" childvalign="left" height="24">
+					<Label text="开启自定义辅路采集视频" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+					<VerticalLayout width="80"/>
+					<Option name="check_custom_sub_video" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true" padding="0,3,0,0"/>
+					<VerticalLayout width="20"/>
+					<Combo name="combo_video_sub_yuvfile" width="130" height="24" style="devicecombo" dropbox="bordercolor=&quot;#FF1E90FF&quot; bordersize=&quot;1&quot; bkcolor=&quot;#FFFFFFFF&quot;">
+						<ListLabelElement text="320×240_video.yuv"/>
+					</Combo>  
+				</HorizontalLayout>
+				<HorizontalLayout inset="28,0,0,0" childvalign="left" height="24">
 					<Label text="由主路进行屏幕分享" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
 					<VerticalLayout width="80"/>
 					<Option name="check_use_main_stream" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true" padding="0,3,0,0"/>
@@ -439,20 +511,6 @@
 					<VerticalLayout width="80"/>
 					<Option name="check_localaudio_open"  text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
 				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="切换房间号(int)" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Edit name="edit_switch_room_id" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
-					<VerticalLayout width="10"/>
-				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="切换房间号(string)" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Edit name="edit_switch_str_room_id" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
-					<VerticalLayout width="10"/>
-					<Button name="btn_switch_room" text="切换" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
-					<VerticalLayout width="10"/>
-				</HorizontalLayout>
 				<HorizontalLayout inset="28,0,0,0" childvalign="left" height="24" visible="false">
 					<Label text="Socks5代理IP" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
 					<VerticalLayout width="80"/>
@@ -465,34 +523,110 @@
 					<Edit name="edit_port" text="" height="24" font="2" align="center" numberonly="true" textpadding="20,0,20,0" tipvalue="输入代理PORT" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
 					<VerticalLayout width="72"/>
 				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="添加过滤窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Edit name="edit_add_excluded_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
-					<VerticalLayout width="10"/>
-					<Button name="btn_add_excluded_wnd" text="添加" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
-					<VerticalLayout width="10"/>
+				<VerticalLayout name="test_feat_layout" visible="false" childpadding="10">
+					<HorizontalLayout inset="28,6,0,0" childvalign="left" height="24">
+						<Label text="开启黑帧推流" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
+						<VerticalLayout width="80"/>
+						<Option name="check_black_push" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="28,6,0,0" childvalign="left" height="24">
+						<Label text="获取最小化窗口" font="2" width="118" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,1"/>
+						<VerticalLayout width="80"/>
+						<Option name="check_mini_windows" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="切换房间号(int)" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_switch_room_id" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="切换房间号(string)" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_switch_str_room_id" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_switch_room" text="切换" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="添加黑名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_add_excluded_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_add_excluded_wnd" text="添加" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="移除黑名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_del_excluded_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_del_excluded_wnd" text="移除" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="添加白名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_add_included_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_add_included_wnd" text="添加" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="移除白名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Edit name="edit_del_included_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_del_included_wnd" text="移除" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="移除黑名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_del_all_excluded_wnd" text="移除所有" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="100" height="30" />
+						<VerticalLayout width="10"/>
+						<Label text="移除白名单窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_del_all_included_wnd" text="移除所有" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="100" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+					<HorizontalLayout name="sei_layout" inset="0,0,0,0" childvalign="left" height="24">
+						<Label text="发送SEI信息" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
+						<VerticalLayout width="10"/>
+						<Button name="btn_send_sei" text="发送" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="100" height="30" />
+						<VerticalLayout width="10"/>
+					</HorizontalLayout>
+				</VerticalLayout>
+				
+				<VerticalLayout height="10"/>
+			</VerticalLayout>
+		    <!--vod setting page-->
+			<VerticalLayout name="vod_tab_layout" childpadding="10" vscrollbar="true">
+				<VerticalLayout height="20"/>
+				<HorizontalLayout childvalign="left" height="24">
+					<HorizontalLayout childvalign="left" inset="8,8,0,0" childpadding="10">
+					  <Label text="渲染模式: " font="2" width="100" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,0"/>
+					 <VerticalLayout width="20"/>
+					  <Option name="vod_wnd_render" group="renderstyle" text="VOD窗口" style="radio_style" width="0" autocalcwidth="true"/>
+					  <Option name="vod_render" group="renderstyle" text="VOD自定义" style="radio_style" width="0" autocalcwidth="true"/>
+					  <Option name="trtc_render" group="renderstyle" text="TRTC自定义" style="radio_style" width="0" autocalcwidth="true"/>
+					</HorizontalLayout>
 				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="移除过滤窗口" font="2" width="110" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Edit name="edit_del_excluded_wnd" text="" height="24" font="2" align="center" textpadding="20,0,20,0" tipvalue="8715442" tipvaluecolor="#FF808080" tipvaluealign="center" normalimage="res='login/edit_normal.png' corner='6,6,6,6'" focusedimage="res='login/edit_focus.png' corner='6,6,6,6'"/>
-					<VerticalLayout width="10"/>
-					<Button name="btn_del_excluded_wnd" text="移除" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="60" height="30" />
-					<VerticalLayout width="10"/>
+				<HorizontalLayout childvalign="left" height="24">
+					<HorizontalLayout childvalign="left" inset="8,8,0,0" childpadding="10">
+					 <Label text="推送视频" font="2" width="100" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,0"/>
+					<VerticalLayout width="80"/>
+					<Option name="check_push_video_stream" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
+					</HorizontalLayout>
 				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="移除过滤窗口" font="2" width="130" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Button name="btn_del_all_excluded_wnd" text="移除所有" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="100" height="30" />
-					<VerticalLayout width="10"/>
+				<HorizontalLayout childvalign="left" height="24">
+					<HorizontalLayout childvalign="left" inset="8,8,0,0" childpadding="10">
+					 <Label text="推送音频" font="2" width="100" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,0,0,0"/>
+					<VerticalLayout width="80"/>
+					<Option name="check_push_audio_stream" text="" textcolor="#FF000000" textpadding="6,0,6,0" style="cb_style" width="0" autocalcwidth="true"/>
+					</HorizontalLayout>
 				</HorizontalLayout>
-				<HorizontalLayout inset="0,0,0,0" childvalign="left" height="24">
-					<Label text="发送SEI信息" font="2" width="130" align="right" valign="center" textcolor="#FF000000" showhtml="true" padding="0,3,0,1"/>
-					<VerticalLayout width="10"/>
-					<Button name="btn_send_sei" text="发送" textcolor="#FF000000" textpadding="6,0,6,0" style="btn_style" width="100" height="30" />
-					<VerticalLayout width="10"/>
-				</HorizontalLayout>
+				<VerticalLayout height="20"/>
 			</VerticalLayout>
 		</TabLayout>
 		</VerticalLayout>

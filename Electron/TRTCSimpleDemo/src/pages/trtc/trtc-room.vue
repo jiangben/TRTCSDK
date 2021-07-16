@@ -61,7 +61,6 @@ import {
   TRTCBeautyStyle,
   Rect,
 } from "trtc-electron-sdk/liteav/trtc_define";
-import mtaH5 from '../../common/mtah5';
 import {BDVideoEncode, BDBeauty} from '../../common/bd-tools';
 let trtcCloud = null; // 用于TRTCQcloud 实例， mounted 时实体化
 export default {
@@ -428,8 +427,6 @@ export default {
     trtcCloud = new TRTCCloud();
     logger.warn(`sdk version: ${trtcCloud.getSDKVersion()}`);
 
-    mtaH5.reportSDKAppID(this.sdkInfo.sdkAppId);
-
     // 4. 配置基本的事件订阅
     trtcCloud.on('onStatistics', (statis)=>{logger.log('onStatistics', statis);});
     trtcCloud.on('onEnterRoom', this.onEnterRoom.bind(this));
@@ -441,7 +438,7 @@ export default {
     logger.log(`mounted, setCurrentCameraDevice('${this.cameraId}')`);
     trtcCloud.setCurrentCameraDevice(this.cameraId);
     // 5. 设置编码参数
-    // TRTCVideoEncParam 的详细说明，请参考： https://trtc-1252463788.file.myqcloud.com/electron_sdk/docs/TRTCVideoEncParam.html
+    // TRTCVideoEncParam 的详细说明，请参考： https://web.sdk.qcloud.com/trtc/electron/doc/zh-cn/trtc_electron_sdk/TRTCVideoEncParam.html
     let encParam = new TRTCVideoEncParam();
 
     /**
@@ -465,11 +462,11 @@ export default {
     trtcCloud.setVideoEncoderParam(encParam)
 
     // 6. 开启美颜 
-    // setBeautyStyle 详细信息，请参考：https://trtc-1252463788.file.myqcloud.com/electron_sdk/docs/TRTCCloud.html#setBeautyStyle
+    // setBeautyStyle 详细信息，请参考：https://web.sdk.qcloud.com/trtc/electron/doc/zh-cn/trtc_electron_sdk/TRTCCloud.html#setBeautyStyle
     trtcCloud.setBeautyStyle(TRTCBeautyStyle.TRTCBeautyStyleNature, 5, 5, 5);
 
     // 7. 进入房间
-    // TRTCParams 详细说明，请查看文档：https://trtc-1252463788.file.myqcloud.com/electron_sdk/docs/TRTCParams.html
+    // TRTCParams 详细说明，请查看文档：https://web.sdk.qcloud.com/trtc/electron/doc/zh-cn/trtc_electron_sdk/TRTCParams.html
     let param = new TRTCParams();
     param.sdkAppId = this.sdkInfo.sdkappid;
     param.userSig = this.sdkInfo.userSig;

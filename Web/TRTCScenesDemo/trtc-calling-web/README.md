@@ -6,7 +6,7 @@
 
 ### 环境要求
 * 请使用最新版本的 Chrome 浏览器。
-* TRTCCalling 依赖以下端口进行数据传输，请将其加入防火墙白名单，配置完成后，您可以通过访问并体验 [官网 Demo](https://demo-1252463788.cos.ap-shanghai.myqcloud.com/trtccalling/demo/index.html) 检查配置是否生效。
+* TRTCCalling 依赖以下端口进行数据传输，请将其加入防火墙白名单，配置完成后，您可以通过访问并体验 [官网 Demo](https://web.sdk.qcloud.com/component/trtccalling/demo/web/latest/index.html) 检查配置是否生效。
   - TCP 端口：8687
   - UDP 端口：8000，8080，8800，843，443，16285
   - 域名：qcloud.rtc.qq.com
@@ -32,7 +32,7 @@
 <span id="step2"></span>
 
 #### 步骤2：下载 SDK 和 Demo 源码
-2. 鼠标移动至对应卡片，单击【[Github](https://github.com/tencentyun/TRTCSDK/tree/master/Web/TRTCScenesDemo/trtc-calling-web)】跳转至 Github（或单击【[ZIP](https://liteavsdk-1252463788.cos.ap-guangzhou.myqcloud.com/H5_latest.zip)】），下载相关 SDK 及配套的 Demo 源码。
+2. 鼠标移动至对应卡片，单击【[Github](https://github.com/tencentyun/TRTCSDK/tree/master/Web/TRTCScenesDemo/trtc-calling-web)】跳转至 Github（或单击【[ZIP](https://web.sdk.qcloud.com/trtc/webrtc/download/webrtc_latest.zip)】），下载相关 SDK 及配套的 Demo 源码。
  ![](https://main.qcloudimg.com/raw/0f35fe3bafe9fcdbd7cc73f991984d1a.png)
 2. 下载完成后，返回实时音视频控制台，单击【我已下载，下一步】，可以查看 SDKAppID 和密钥信息。
 
@@ -78,9 +78,25 @@
 ### 实现自定义 UI 界面
 #### 步骤1：集成 SDK
 NPM 集成
+> 从v0.6.0起，需要手动安装依赖 [trtc-js-sdk](https://www.npmjs.com/package/trtc-js-sdk) 和 [tim-js-sdk](https://www.npmjs.com/package/tim-js-sdk) 以及 [tsignaling](https://www.npmjs.com/package/tsignaling)
+>- 为了减小 trtc-calling-js.js 的体积，避免和接入侧已使用的 trtc-js-sdk 和 tim-js-sdk 以及 tsignaling 发生版本冲突，trtc-js-sdk 和 tim-js-sdk 以及 tsignaling 不再被打包到 trtc-calling-js.js，在使用前您需要手动安装依赖。
 ```javascript
-//TRTCCalling SDK
-npm install trtc-calling-js --save
+  npm i trtc-js-sdk --save
+  npm i tim-js-sdk --save
+  npm i tsignaling --save
+  npm i trtc-calling-js --save
+ 
+  // 如果您通过 script 方式使用 trtc-calling-js，需要按顺序先手动引入 trtc.js
+  <script src="./trtc.js"></script>
+  
+  // 接着手动引入 tim-js.js
+  <script src="./tim-js.js"></script>
+  
+  // 然后再手动引入 tsignaling.js
+  <script src="./tsignaling.js"></script>
+
+  // 最后再手动引入 trtc-calling-js.js
+  <script src="./trtc-calling-js.js"></script>
 ```
 在项目脚本里引入模块
 ```javascript

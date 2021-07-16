@@ -57,6 +57,8 @@ public: //cb
     virtual void NotifyMixTab(TNotifyUI& msg);
     virtual void NotifyRecordTab(TNotifyUI& msg);
     virtual void NotifyAudioRecord(TNotifyUI& msg);
+    virtual void NotifyLocalRecord(TNotifyUI& msg);
+    virtual void NotifyVodTab(TNotifyUI& msg);
     virtual CControlUI* CreateControl(LPCTSTR pstrClass);
 
     //ITRTCCloudCallback
@@ -86,6 +88,7 @@ private:
     void InitOtherTab();
     void InitMixTab();
     void InitRecordTab();
+    void InitVodTab();
     void UpdateCameraDevice();
     void UpdateMicDevice();
     void UpdateSpeakerDevice();
@@ -94,7 +97,6 @@ private:
     void stopAllTestSetting();
 private:
     void updateRoleUi();
-    void UpdateAudioQualityUi();
     void updateVideoBitrateUi();
     bool isCustomUploaderStreamIdValid(const std::string &streamId);
 public:
@@ -124,4 +126,6 @@ public:
     static std::vector<TRTCSettingViewControllerNotify*> vecNotifyList;
 
     wstring m_strAudioRecordFile;
+    wstring m_strMixAudioAppPath;
+    wstring m_strLocalRecordFile;
 };
